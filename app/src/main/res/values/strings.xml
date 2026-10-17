@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Cow Business</string>
+    <string name="hint_cows">Number of Cows</string>
+    <string name="hint_cost">Cost per Cow</string>
+    <string name="hint_milk">Milk per Cow</string>
+    <string name="hint_price">Milk Price</string>
+    <string name="hint_expense">Monthly Expense</string>
+    <string name="hint_years">Years</string>
+    <string name="calculate">Calculate</string>
+</resources>

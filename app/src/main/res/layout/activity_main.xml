@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@drawable/app_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:background="#CCFFFFFF">
+
+        <TextView
+            android:id="@+id/appTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="COW BUSINESS PLANNER"
+            android:gravity="center"
+            android:textSize="24sp"
+            android:fontFamily="sans-serif-black"
+            android:textColor="#1B5E20"
+            android:letterSpacing="0.1"
+            android:layout_marginBottom="20dp"
+            android:padding="10dp" />
+
+        <Spinner
+            android:id="@+id/currencySpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:minHeight="48dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:boxStrokeColor="#E91E63"
+            app:hintTextColor="#E91E63"
+            app:startIconDrawable="@android:drawable/ic_menu_agenda"
+            app:startIconTint="#E91E63">
+
+            <EditText
+                android:id="@+id/cows"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Number of Cows"
+                android:inputType="number"
+                android:textColor="#C2185B" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:boxStrokeColor="#4CAF50"
+            app:hintTextColor="#4CAF50"
+            app:startIconDrawable="@android:drawable/ic_menu_save"
+            app:startIconTint="#4CAF50">
+
+            <EditText
+                android:id="@+id/cost"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Cost per Cow"
+                android:inputType="numberDecimal"
+                android:textColor="#388E3C" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:boxStrokeColor="#2196F3"
+            app:hintTextColor="#2196F3"
+            app:startIconDrawable="@android:drawable/ic_menu_compass"
+            app:startIconTint="#2196F3">
+
+            <EditText
+                android:id="@+id/milk"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Milk per Day (L)"
+                android:inputType="numberDecimal"
+                android:textColor="#1976D2" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:boxStrokeColor="#9C27B0"
+            app:hintTextColor="#9C27B0"
+            app:startIconDrawable="@android:drawable/ic_menu_send"
+            app:startIconTint="#9C27B0">
+
+            <EditText
+                android:id="@+id/price"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Price per Liter"
+                android:inputType="numberDecimal"
+                android:textColor="#7B1FA2" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:boxStrokeColor="#F44336"
+            app:hintTextColor="#F44336"
+            app:startIconDrawable="@android:drawable/ic_menu_delete"
+            app:startIconTint="#F44336">
+
+            <EditText
+                android:id="@+id/expense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Monthly Expense"
+                android:inputType="numberDecimal"
+                android:textColor="#D32F2F" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:boxStrokeColor="#FF9800"
+            app:hintTextColor="#FF9800"
+            app:startIconDrawable="@android:drawable/ic_menu_recent_history"
+            app:startIconTint="#FF9800">
+
+            <EditText
+                android:id="@+id/years"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Years"
+                android:inputType="number"
+                android:text="5"
+                android:textColor="#F57C00" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:boxStrokeColor="#673AB7"
+            app:hintTextColor="#673AB7"
+            app:startIconDrawable="@android:drawable/ic_lock_idle_lock"
+            app:startIconTint="#673AB7">
+
+            <EditText
+                android:id="@+id/loan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Loan Amount"
+                android:inputType="numberDecimal"
+                android:textColor="#512DA8" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            app:boxStrokeColor="#009688"
+            app:hintTextColor="#009688"
+            app:startIconDrawable="@android:drawable/star_on"
+            app:startIconTint="#009688">
+
+            <EditText
+                android:id="@+id/rate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Interest Rate %"
+                android:inputType="numberDecimal"
+                android:textColor="#00796B" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Switch
+            android:id="@+id/darkModeSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:minHeight="48dp"
+            android:text="Dark Mode"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/calculateBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="Calculate"
+            android:textAllCaps="true"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/profitAnalysisBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="#2E7D32"
+                android:text="Profit Analysis"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/lossAnalysisBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="#C62828"
+                android:text="Loss Analysis"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/resetBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:backgroundTint="#455A64"
+            android:text="Reset Data" />
+
+        <LinearLayout
+            android:id="@+id/aiCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:background="#F0F4C3"
+            android:elevation="4dp"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/aiText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="AI Prediction"
+                android:textColor="#33691E"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/previewChart"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_marginTop="15dp"
+            android:background="#F5F5F5" />
+
+        <TextView
+            android:id="@+id/developerText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:text="Developed by Goutam Gupta"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:textStyle="bold|italic" />
+
+    </LinearLayout>
+</ScrollView>

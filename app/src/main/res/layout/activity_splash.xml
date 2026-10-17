@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0A0E14">
+
+    <TextView
+        android:id="@+id/appName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/logo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp"
+        android:fontFamily="monospace"
+        android:text="COW BUSINESS BI"
+        android:textColor="#00E676"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.1"
+        android:shadowColor="#00E676"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="15" />
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="220dp"
+        android:layout_height="220dp"
+        android:layout_centerInParent="true"
+        android:src="@drawable/app_background2" />
+
+    <TextView
+        android:id="@+id/splashText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/logo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:fontFamily="monospace"
+        android:letterSpacing="0.2"
+        android:text="INITIALIZING AI CORE..."
+        android:textColor="#00E676"
+        android:textSize="12sp" />
+
+    <ProgressBar
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="60dp"
+        android:indeterminateTint="#00E676" />
+
+</RelativeLayout>
