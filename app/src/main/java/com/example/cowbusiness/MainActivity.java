@@ -40,6 +40,47 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences prefs;
     String selectedCurrency = "$";
 
+    public static final String[] CURRENCY_ITEMS = {
+            "$ - USD (US Dollar)",
+            "₹ - INR (Indian Rupee)",
+            "€ - EUR (Euro)",
+            "£ - GBP (British Pound)",
+            "¥ - JPY / CNY (Yen / Yuan)",
+            "रू - NPR (Nepalese Rupee)",
+            "৳ - BDT (Bangladeshi Taka)",
+            "₨ - PKR (Pakistani Rupee)",
+            "د.إ - AED (UAE Dirham)",
+            "﷼ - SAR (Saudi Riyal)",
+            "C$ - CAD (Canadian Dollar)",
+            "A$ - AUD (Australian Dollar)",
+            "CHF - CHF (Swiss Franc)",
+            "₽ - RUB (Russian Ruble)",
+            "₩ - KRW (South Korean Won)",
+            "₺ - TRY (Turkish Lira)",
+            "R$ - BRL (Brazilian Real)",
+            "R - ZAR (South African Rand)",
+            "KD - KWD (Kuwaiti Dinar)",
+            "Rs - LKR (Sri Lankan Rupee)",
+            "₱ - PHP (Philippine Peso)",
+            "₫ - VND (Vietnamese Dong)",
+            "฿ - THB (Thai Baht)",
+            "RM - MYR (Malaysian Ringgit)",
+            "Rp - IDR (Indonesian Rupiah)",
+            "₦ - NGN (Nigerian Naira)",
+            "₵ - GHS (Ghanaian Cedi)",
+            "zł - PLN (Polish Zloty)",
+            "kr - SEK / NOK (Krona)",
+            "KSh - KES (Kenyan Shilling)",
+            "E£ - EGP (Egyptian Pound)",
+            "QAR - QAR (Qatari Riyal)"
+    };
+
+    public static final String[] CURRENCY_SYMBOLS = {
+            "$", "₹", "€", "£", "¥", "रू", "৳", "₨", "د.إ", "﷼",
+            "C$", "A$", "CHF", "₽", "₩", "₺", "R$", "R", "KD", "Rs",
+            "₱", "₫", "฿", "RM", "Rp", "₦", "₵", "zł", "kr", "KSh", "E£", "QAR"
+    };
+
     int[] darkColors = {Color.parseColor("#BBDEFB"), Color.parseColor("#C8E6C9"), Color.parseColor("#FFF9C4"), Color.parseColor("#FFCDD2"), Color.parseColor("#D1C4E9")};
 
     @SuppressLint("MissingInflatedId")
@@ -70,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
             if (validateInputs()) {
                 processCalculation();
             } else {
-                Toast.makeText(this, "Input Required: Populate All Data Fields", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Input Required: Populate All Data Fields with valid values", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -95,52 +136,80 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupCurrencySpinner() {
-        String[] codes = {"$", "₹", "£", "€", "¥", "रू"};
-        currencySpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, codes));
+        currencySpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, CURRENCY_ITEMS));
         currencySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override public void onItemSelected(AdapterView<?> p, View v, int pos, long id) { selectedCurrency = codes[pos]; }
+            @Override public void onItemSelected(AdapterView<?> p, View v, int pos, long id) {
+                if (pos >= 0 && pos < CURRENCY_SYMBOLS.length) {
+                    selectedCurrency = CURRENCY_SYMBOLS[pos];
+                    saveData();
+                }
+            }
             @Override public void onNothingSelected(AdapterView<?> p) {}
         });
     }
 
     private boolean validateInputs() {
-        return !cows.getText().toString().isEmpty() && !cost.getText().toString().isEmpty() &&
-                !milk.getText().toString().isEmpty() && !price.getText().toString().isEmpty() &&
-                !expense.getText().toString().isEmpty() && !years.getText().toString().isEmpty();
+        if (cows.getText().toString().trim().isEmpty() ||
+            cost.getText().toString().trim().isEmpty() ||
+            milk.getText().toString().trim().isEmpty() ||
+            price.getText().toString().trim().isEmpty() ||
+            expense.getText().toString().trim().isEmpty() ||
+            years.getText().toString().trim().isEmpty()) {
+            return false;
+        }
+        try {
+            int c = Integer.parseInt(cows.getText().toString().trim());
+            int y = Integer.parseInt(years.getText().toString().trim());
+            double cCost = Double.parseDouble(cost.getText().toString().trim());
+            double m = Double.parseDouble(milk.getText().toString().trim());
+            double p = Double.parseDouble(price.getText().toString().trim());
+            double e = Double.parseDouble(expense.getText().toString().trim());
+            return c > 0 && y > 0 && cCost >= 0 && m >= 0 && p >= 0 && e >= 0;
+        } catch (NumberFormatException ex) {
+            return false;
+        }
     }
 
     private void performFinancialAnalysis(boolean isProfitRequest) {
+        if (!validateInputs()) {
+            Toast.makeText(this, "Input Required: Populate All Data Fields with valid values", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         try {
-            double dailyMilk = Double.parseDouble(milk.getText().toString());
-            double milkPrice = Double.parseDouble(price.getText().toString());
-            double monthlyExp = Double.parseDouble(expense.getText().toString());
-            int totalYrs = Integer.parseInt(years.getText().toString());
+            int totalCows = Integer.parseInt(cows.getText().toString().trim());
+            double costPerCow = Double.parseDouble(cost.getText().toString().trim());
+            double dailyMilk = Double.parseDouble(milk.getText().toString().trim());
+            double milkPrice = Double.parseDouble(price.getText().toString().trim());
+            double monthlyExp = Double.parseDouble(expense.getText().toString().trim());
+            int totalYrs = Integer.parseInt(years.getText().toString().trim());
 
-            // --- LOAN CALCULATION LOGIC INTEGRATION ---
-            double loanPrincipal = loan.getText().toString().isEmpty() ? 0 : Double.parseDouble(loan.getText().toString());
-            double interestRate = rate.getText().toString().isEmpty() ? 0 : Double.parseDouble(rate.getText().toString());
+            double loanPrincipal = loan.getText().toString().trim().isEmpty() ? 0 : Double.parseDouble(loan.getText().toString().trim());
+            double interestRate = rate.getText().toString().trim().isEmpty() ? 0 : Double.parseDouble(rate.getText().toString().trim());
 
-            // Calculate EMI to deduct from monthly revenue
-            double monthlyEmi = LoanCalculator.calculateEMI(loanPrincipal, interestRate, totalYrs * 12);
-            double annualLoanBurden = monthlyEmi * 12;
+            // Accurate calculation matching BusinessCalculator
+            double totalNetProfit = BusinessCalculator.calculateProfit(
+                    totalCows, costPerCow, dailyMilk, milkPrice, monthlyExp, totalYrs, loanPrincipal, interestRate);
+            double netAnnualProfit = totalNetProfit / totalYrs;
 
-            // Revenue calculation (assuming 360 days for simplicity)
-            double annualRevenue = (dailyMilk * milkPrice * 360);
-            double annualExpenses = (monthlyExp * 12) + annualLoanBurden;
-
-            double netAnnualProfit = annualRevenue - annualExpenses;
-
-            if (isProfitRequest && netAnnualProfit > 0) {
-                showGraph(totalYrs, netAnnualProfit, "Net Profit", Color.GREEN);
-                aiText.setText("AI Projection: Total Net Profit " + selectedCurrency + String.format("%.2f", netAnnualProfit * totalYrs));
-                generateDetailedPDF("Profit_Analytics_Report", netAnnualProfit, true);
-            } else if (!isProfitRequest && netAnnualProfit < 0) {
-                showGraph(totalYrs, Math.abs(netAnnualProfit), "Net Loss", Color.RED);
-                aiText.setText("AI Prediction: Total Net Loss " + selectedCurrency + String.format("%.2f", Math.abs(netAnnualProfit * totalYrs)));
-                generateDetailedPDF("Loss_Analytics_Report", netAnnualProfit, false);
+            if (isProfitRequest) {
+                if (totalNetProfit >= 0) {
+                    showGraph(totalYrs, netAnnualProfit, "Net Profit", Color.parseColor("#00C853"));
+                    String aiMsg = PredictionHelper.predict(totalCows, dailyMilk, monthlyExp, totalNetProfit, selectedCurrency);
+                    aiText.setText(aiMsg);
+                    generateDetailedPDF("Profit_Analytics_Report", netAnnualProfit, true);
+                } else {
+                    Toast.makeText(this, "Analysis Mismatch: System calculated a Net Loss of " + selectedCurrency + " " + String.format("%,.2f", Math.abs(totalNetProfit)), Toast.LENGTH_LONG).show();
+                }
             } else {
-                String resultType = netAnnualProfit > 0 ? "Profit" : "Loss";
-                Toast.makeText(this, "Analysis Mismatch: System calculated a " + resultType, Toast.LENGTH_LONG).show();
+                if (totalNetProfit < 0) {
+                    showGraph(totalYrs, Math.abs(netAnnualProfit), "Net Loss", Color.parseColor("#FF1744"));
+                    String aiMsg = PredictionHelper.predict(totalCows, dailyMilk, monthlyExp, totalNetProfit, selectedCurrency);
+                    aiText.setText(aiMsg);
+                    generateDetailedPDF("Loss_Analytics_Report", netAnnualProfit, false);
+                } else {
+                    Toast.makeText(this, "Analysis Mismatch: System calculated a Net Profit of " + selectedCurrency + " " + String.format("%,.2f", totalNetProfit), Toast.LENGTH_LONG).show();
+                }
             }
         } catch (Exception e) {
             Toast.makeText(this, "Data Error: Verify all numerical inputs", Toast.LENGTH_SHORT).show();
@@ -198,13 +267,13 @@ public class MainActivity extends AppCompatActivity {
         paint.setColor(Color.DKGRAY);
 
         canvas.drawText("Total Cows: " + cows.getText(), x, y, paint);
-        canvas.drawText("Cost per Unit Cow: " + selectedCurrency + cost.getText(), x + 250, y, paint);
+        canvas.drawText("Cost per Unit Cow: " + selectedCurrency + " " + cost.getText(), x + 250, y, paint);
         y += 25;
         canvas.drawText("Milk/Day: " + milk.getText() + "L", x, y, paint);
-        canvas.drawText("Price/Liter: " + selectedCurrency + price.getText(), x + 250, y, paint);
+        canvas.drawText("Price/Liter: " + selectedCurrency + " " + price.getText(), x + 250, y, paint);
         y += 25;
-        canvas.drawText("Monthly Expense: " + selectedCurrency + expense.getText(), x, y, paint);
-        canvas.drawText("Loan Amount: " + selectedCurrency + (loan.getText().toString().isEmpty() ? "0" : loan.getText()) + " , Rate = " + rate.getText() + "%", x + 250, y, paint);
+        canvas.drawText("Monthly Expense: " + selectedCurrency + " " + expense.getText(), x, y, paint);
+        canvas.drawText("Loan Amount: " + selectedCurrency + " " + (loan.getText().toString().isEmpty() ? "0" : loan.getText()) + " , Rate = " + rate.getText() + "%", x + 250, y, paint);
 
         // --- DRAWABLE QR CODE INTEGRATION ---
         int qrSize = 80;
@@ -250,7 +319,7 @@ public class MainActivity extends AppCompatActivity {
             paint.setColor(Color.BLACK);
             paint.setTextSize(12);
             paint.setFakeBoldText(false);
-            String entry = "Year " + i + ": " + selectedCurrency + String.format("%.2f", Math.abs(annualAmount * i));
+            String entry = "Year " + i + ": " + selectedCurrency + " " + String.format("%,.2f", Math.abs(annualAmount * i));
             canvas.drawText(entry, x, y, paint);
 
             // Neon Aesthetic Bar
@@ -286,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
         paint.setTextSize(16);
         paint.setFakeBoldText(true);
         y += 35;
-        canvas.drawText((isProfit ? "NET PROJECTED PROFIT: " : "NET PROJECTED LIABILITY: ") + selectedCurrency + String.format("%,.2f", totalAmount), x + 15, y, paint);
+        canvas.drawText((isProfit ? "NET PROJECTED PROFIT: " : "NET PROJECTED LIABILITY: ") + selectedCurrency + " " + String.format("%,.2f", totalAmount), x + 15, y, paint);
 
         y += 60;
         paint.setColor(Color.parseColor("#455A64"));
@@ -344,38 +413,56 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void processCalculation() {
+        int totalCows = Integer.parseInt(cows.getText().toString().trim());
+        double costPerCow = Double.parseDouble(cost.getText().toString().trim());
+        double dailyMilk = Double.parseDouble(milk.getText().toString().trim());
+        double milkPrice = Double.parseDouble(price.getText().toString().trim());
+        double monthlyExp = Double.parseDouble(expense.getText().toString().trim());
+        int totalYrs = Integer.parseInt(years.getText().toString().trim());
+
+        double loanPrincipal = loan.getText().toString().trim().isEmpty() ? 0 : Double.parseDouble(loan.getText().toString().trim());
+        double interestRate = rate.getText().toString().trim().isEmpty() ? 0 : Double.parseDouble(rate.getText().toString().trim());
+
         double p = BusinessCalculator.calculateProfit(
-                Integer.parseInt(cows.getText().toString()),
-                Double.parseDouble(cost.getText().toString()),
-                Double.parseDouble(milk.getText().toString()),
-                Double.parseDouble(price.getText().toString()),
-                Double.parseDouble(expense.getText().toString()),
-                Integer.parseInt(years.getText().toString()),
-                Double.parseDouble(loan.getText().toString().isEmpty() ? "0" : loan.getText().toString()),
-                Double.parseDouble(rate.getText().toString().isEmpty() ? "0" : rate.getText().toString())
+                totalCows, costPerCow, dailyMilk, milkPrice, monthlyExp, totalYrs, loanPrincipal, interestRate
         );
 
         double emi = LoanCalculator.calculateEMI(
-                Double.parseDouble(loan.getText().toString().isEmpty() ? "0" : loan.getText().toString()),
-                Double.parseDouble(rate.getText().toString().isEmpty() ? "0" : rate.getText().toString()),
-                Integer.parseInt(years.getText().toString()) * 12
+                loanPrincipal, interestRate, totalYrs * 12
         );
+
+        String aiPrediction = PredictionHelper.predict(totalCows, dailyMilk, monthlyExp, p, selectedCurrency);
+        aiText.setText(aiPrediction);
 
         saveData();
         Intent i = new Intent(this, ResultActivity.class);
         i.putExtra("profit", p);
         i.putExtra("currency", selectedCurrency);
         i.putExtra("emi", emi);
-        i.putExtra("suggestion", BusinessCalculator.getSuggestion(p));
-        i.putExtra("ai", aiText.getText().toString());
+        i.putExtra("suggestion", BusinessCalculator.getSuggestion(p, selectedCurrency));
+        i.putExtra("ai", aiPrediction);
+        i.putExtra("years", totalYrs);
+        i.putExtra("cows", totalCows);
+        i.putExtra("cost", costPerCow);
+        i.putExtra("milk", dailyMilk);
+        i.putExtra("price", milkPrice);
+        i.putExtra("expense", monthlyExp);
+        i.putExtra("loan", loanPrincipal);
+        i.putExtra("rate", interestRate);
         startActivity(i);
     }
 
     private void showGraph(int y, double amt, String l, int col) {
         List<BarEntry> ent = new ArrayList<>();
-        for (int i = 1; i <= y; i++) ent.add(new BarEntry(i, (float) (amt * i)));
-        BarDataSet ds = new BarDataSet(ent, l); ds.setColor(col);
-        previewChart.setData(new BarData(ds)); previewChart.animateY(1000); previewChart.invalidate();
+        for (int i = 1; i <= y; i++) ent.add(new BarEntry(i, (float) Math.abs(amt * i)));
+        BarDataSet ds = new BarDataSet(ent, l + " (" + selectedCurrency + ")");
+        ds.setColor(col);
+        ds.setValueTextColor(Color.BLACK);
+        ds.setValueTextSize(10f);
+        previewChart.setData(new BarData(ds));
+        previewChart.getDescription().setEnabled(false);
+        previewChart.animateY(1000);
+        previewChart.invalidate();
     }
 
     private void startDeveloperNeonGlow() {
@@ -404,14 +491,22 @@ public class MainActivity extends AppCompatActivity {
         e.putString("milk", milk.getText().toString()); e.putString("price", price.getText().toString());
         e.putString("expense", expense.getText().toString()); e.putString("years", years.getText().toString());
         e.putString("loan", loan.getText().toString()); e.putString("rate", rate.getText().toString());
+        e.putString("currency", selectedCurrency);
         e.apply();
     }
 
     private void loadData() {
         cows.setText(prefs.getString("cows", "")); cost.setText(prefs.getString("cost", ""));
         milk.setText(prefs.getString("milk", "")); price.setText(prefs.getString("price", ""));
-        expense.setText(prefs.getString("expense", "")); years.setText(prefs.getString("years", ""));
+        expense.setText(prefs.getString("expense", "")); years.setText(prefs.getString("years", "5"));
         loan.setText(prefs.getString("loan", "")); rate.setText(prefs.getString("rate", ""));
+        selectedCurrency = prefs.getString("currency", "$");
+        for (int i = 0; i < CURRENCY_SYMBOLS.length; i++) {
+            if (CURRENCY_SYMBOLS[i].equals(selectedCurrency)) {
+                currencySpinner.setSelection(i);
+                break;
+            }
+        }
     }
 
     private void showColorPickerDialog() {

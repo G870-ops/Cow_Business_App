@@ -34,6 +34,14 @@ public class ResultActivity extends AppCompatActivity {
     double currentProfit = 0;
     double currentEmi = 0;
     String currentAiText = "";
+    int currentYears = 1;
+    int currentCows = 0;
+    double currentCost = 0;
+    double currentMilk = 0;
+    double currentPrice = 0;
+    double currentExpense = 0;
+    double currentLoan = 0;
+    double currentRate = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,22 +65,30 @@ public class ResultActivity extends AppCompatActivity {
         String suggestion = getIntent().getStringExtra("suggestion");
         currentAiText = getIntent().getStringExtra("ai");
         currentEmi = getIntent().getDoubleExtra("emi", 0);
+        currentYears = getIntent().getIntExtra("years", 1);
+        currentCows = getIntent().getIntExtra("cows", 0);
+        currentCost = getIntent().getDoubleExtra("cost", 0);
+        currentMilk = getIntent().getDoubleExtra("milk", 0);
+        currentPrice = getIntent().getDoubleExtra("price", 0);
+        currentExpense = getIntent().getDoubleExtra("expense", 0);
+        currentLoan = getIntent().getDoubleExtra("loan", 0);
+        currentRate = getIntent().getDoubleExtra("rate", 0);
 
-        // 🔹 DYNAMIC UI UPDATES
-        profitText.setText(String.format("Total Profit: %s %.2f", currentCurrency, currentProfit));
-        emiText.setText(String.format("Monthly EMI: %s %.2f", currentCurrency, currentEmi));
-        suggestionText.setText(suggestion);
-        aiText.setText(currentAiText);
-
+        // 🔹 DYNAMIC UI UPDATES WITH ACCURATE CURRENCY FORMATTING
         if (currentProfit < 0) {
             profitText.setTextColor(Color.parseColor("#FF5252"));
-            profitText.setText(String.format("Total Loss: %s %.2f", currentCurrency, Math.abs(currentProfit)));
+            profitText.setText(String.format("Total Loss: %s %,.2f", currentCurrency, Math.abs(currentProfit)));
         } else {
             profitText.setTextColor(Color.parseColor("#4CAF50")); // Green — visible on any background
+            profitText.setText(String.format("Total Profit: %s %,.2f", currentCurrency, currentProfit));
         }
 
+        emiText.setText(String.format("Monthly EMI: %s %,.2f", currentCurrency, currentEmi));
+        suggestionText.setText(suggestion != null ? suggestion : BusinessCalculator.getSuggestion(currentProfit, currentCurrency));
+        aiText.setText(currentAiText != null ? currentAiText : "AI Strategic Analysis");
+
         // 🔹 BAR CHART LOGIC
-        setupChart(currentProfit, currentCurrency);
+        setupChart(currentProfit, currentCurrency, currentYears);
 
         // ✅ EXIT BUTTON
         exitBtn.setOnClickListener(v -> finish());
@@ -81,14 +97,27 @@ public class ResultActivity extends AppCompatActivity {
         downloadPdfBtn.setOnClickListener(v -> generateReportPDF());
     }
 
-    private void setupChart(double profit, String currency) {
-        ArrayList<BarEntry> entries = new ArrayList<>();
-        entries.add(new BarEntry(1f, (float) Math.abs(profit)));
+    public void setupChart(double profit, String currency) {
+        setupChart(profit, currency, currentYears);
+    }
 
-        BarDataSet dataSet = new BarDataSet(entries, "Financial Summary (" + currency + ")");
+    public void setupChart(double profit, String currency, int years) {
+        ArrayList<BarEntry> entries = new ArrayList<>();
+        int validYears = Math.max(1, years);
+        if (validYears > 1) {
+            double annual = profit / validYears;
+            for (int i = 1; i <= validYears; i++) {
+                entries.add(new BarEntry(i, (float) Math.abs(annual * i)));
+            }
+        } else {
+            entries.add(new BarEntry(1f, (float) Math.abs(profit)));
+        }
+
+        String label = (profit >= 0 ? "Projected Profit (" : "Projected Loss (") + currency + ")";
+        BarDataSet dataSet = new BarDataSet(entries, label);
         dataSet.setColor(profit >= 0 ? Color.parseColor("#4CAF50") : Color.parseColor("#F44336"));
         dataSet.setValueTextColor(Color.BLACK);
-        dataSet.setValueTextSize(14f);
+        dataSet.setValueTextSize(12f);
 
         BarData data = new BarData(dataSet);
         chart.setData(data);
@@ -105,7 +134,9 @@ public class ResultActivity extends AppCompatActivity {
         Canvas canvas = page.getCanvas();
 
         Paint paint = new Paint();
+        paint.setAntiAlias(true);
         TextPaint textPaint = new TextPaint();
+        textPaint.setAntiAlias(true);
 
         // 1. Header Background
         paint.setColor(currentProfit >= 0 ? Color.parseColor("#004D40") : Color.parseColor("#B71C1C"));
@@ -115,22 +146,34 @@ public class ResultActivity extends AppCompatActivity {
         paint.setColor(Color.WHITE);
         paint.setTextSize(22);
         paint.setFakeBoldText(true);
-        canvas.drawText("COW BUSINESS ANALYSIS REPORT", 40, 70, paint);
+        canvas.drawText("COW BUSINESS ANALYSIS REPORT", 40, 65, paint);
+        paint.setTextSize(12);
+        paint.setFakeBoldText(false);
+        paint.setAlpha(190);
+        canvas.drawText("EXECUTIVE FINANCIAL SUMMARY • ALL CURRENCIES COMPLIANT", 40, 90, paint);
+        paint.setAlpha(255);
 
         // 3. Financial Summary Section
         paint.setColor(Color.BLACK);
         paint.setTextSize(14);
         paint.setFakeBoldText(true);
-        int y = 160;
-        canvas.drawText("FINANCIAL SUMMARY", 40, y, paint);
+        int y = 150;
+        canvas.drawText("FINANCIAL SUMMARY (" + currentCurrency + ")", 40, y, paint);
 
         paint.setFakeBoldText(false);
-        y += 30;
-        canvas.drawText("Project Status: " + (currentProfit >= 0 ? "PROFITABLE" : "LOSS RECOVERY"), 40, y, paint);
         y += 25;
-        canvas.drawText("Net Result: " + currentCurrency + String.format("%.2f", currentProfit), 40, y, paint);
-        y += 25;
-        canvas.drawText("Monthly EMI: " + currentCurrency + String.format("%.2f", currentEmi), 40, y, paint);
+        canvas.drawText("Project Status: " + (currentProfit >= 0 ? "PROFITABLE BUSINESS MODEL" : "NET LOSS ALERT / RECOVERY REQUIRED"), 40, y, paint);
+        y += 20;
+        canvas.drawText("Net Result (" + currentYears + " Years): " + (currentProfit >= 0 ? "Profit " : "Loss ") + currentCurrency + " " + String.format("%,.2f", Math.abs(currentProfit)), 40, y, paint);
+        y += 20;
+        canvas.drawText("Monthly EMI Commitment: " + currentCurrency + " " + String.format("%,.2f", currentEmi), 40, y, paint);
+
+        if (currentCows > 0) {
+            y += 20;
+            canvas.drawText("Herd Size: " + currentCows + " Cows | Milk/Day/Cow: " + currentMilk + "L | Milk Price: " + currentCurrency + " " + String.format("%,.2f", currentPrice) + "/L", 40, y, paint);
+            y += 20;
+            canvas.drawText("Monthly Operational Expense: " + currentCurrency + " " + String.format("%,.2f", currentExpense) + " | Forecast: " + currentYears + " Years", 40, y, paint);
+        }
 
         // 4. DRAW CHART IMAGE INTO PDF
         y += 40;

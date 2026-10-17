@@ -41,9 +41,9 @@
 | 📊 **Interactive Bar Charts** | Year-wise profit/loss forecast rendered using MPAndroidChart |
 | 🤖 **AI Prediction Engine** | Rule-based AI suggestions for improving farm productivity |
 | 📄 **PDF Report Export** | Multi-page PDF with header, year-wise table, AI advisory, QR stamp, and share support |
-| 💱 **Multi-Currency Support** | Select from USD `$`, INR `₹`, GBP `£`, EUR `€`, JPY `¥`, NPR `रू` |
+| 💱 **Multi-Currency Support** | 32+ global currencies (USD `$`, INR `₹`, EUR `€`, GBP `£`, JPY `¥`, NPR `रू`, BDT `৳`, PKR `₨`, AED `د.إ`, SAR `﷼`, CAD `C$`, AUD `A$`, CHF, RUB `₽`, KRW `₩`, TRY `₺`, BRL `R$`, ZAR `R`, etc.) with auto-save & restore |
 | 🌙 **Dark Mode** | Toggle dark mode with aesthetic color picker (Cyan, Emerald, Amber, Crimson) |
-| 💾 **Data Persistence** | Inputs are auto-saved via `SharedPreferences` and restored on next launch |
+| 💾 **Data Persistence** | Inputs and selected currency are auto-saved via `SharedPreferences` and restored on next launch |
 | ✨ **Splash Screen** | Animated splash with glitch effect, typing animation, and fade transitions |
 | 🔄 **Reset with Confirmation** | AlertDialog confirmation before wiping all local data |
 
@@ -59,9 +59,9 @@ MainActivity
     │
     ├──► [Calculate] ──────────────► ResultActivity
     │                                    │
-    │                                    ├── Profit/Loss bar chart
-    │                                    ├── EMI display
-    │                                    ├── AI advisory text
+    │                                    ├── Profit/Loss multi-year bar chart
+    │                                    ├── Monthly EMI display
+    │                                    ├── AI advisory text with currency
     │                                    └── [Download PDF] → share via intent
     │
     ├──► [Profit Analysis] ─────────► Bar chart preview + PDF generation
@@ -173,7 +173,8 @@ CowBusiness/
 ## 📖 How to Use
 
 1. **Launch the app** — the animated splash screen initializes for ~3.8 seconds.
-2. **Fill in the input fields** on the main screen:
+2. **Select your currency** from the spinner (32 world currencies supported, e.g. `$`, `₹`, `€`, `£`, `¥`, `रू`, `৳`, `₨`, `AED`, `﷼`, `C$`, `A$`, `CHF`).
+3. **Fill in the input fields** on the main screen:
 
    | Field | Description |
    |---|---|
@@ -186,10 +187,9 @@ CowBusiness/
    | Loan Amount | *(Optional)* Total loan taken |
    | Interest Rate (%) | *(Optional)* Annual interest rate |
 
-3. **Select your currency** from the spinner (top of screen).
-4. **Tap Calculate** to view the full financial report in `ResultActivity`.
+4. **Tap Calculate** to view the full financial report and multi-year projection in `ResultActivity`.
 5. **Tap Profit Analysis / Loss Analysis** to see a chart preview on the main screen and generate a detailed PDF.
-6. **In ResultActivity**, tap **Download PDF** to export and share the report.
+6. **In ResultActivity**, tap **GENERATE PDF REPORT** to export and share the report with live charts and full breakdown.
 
 ---
 
@@ -225,11 +225,7 @@ Where:
 
 ### `PredictionHelper.predict()`
 
-| Condition | Prediction |
-|---|---|
-| milkPerDay > 15 AND expense < 30,000 | 🟢 High yield farm — Very profitable |
-| milkPerDay > 10 | 🟡 Average growth — Improve feeding strategy |
-| Otherwise | 🔴 Low productivity — Consider better cow breed |
+Dynamic AI strategic predictions tailored to cow count, milk yield, expenses, net profit/loss, and the selected currency symbol.
 
 ---
 
@@ -244,20 +240,23 @@ Two PDF generators are present:
 ### 2. `ResultActivity.generateReportPDF()` — Triggered by Download PDF button
 - Embeds the **live bar chart bitmap** directly into the PDF
 - Includes multi-line AI advisory using `StaticLayout`
+- Includes full breakdown of herd size, daily yield, operational expenses, and loan commitments
 - Shares via Android's `ACTION_SEND` intent (WhatsApp, Gmail, Drive, etc.)
 
 ---
 
-## 🐛 Bug Fixes Applied
+## 🐛 Bug Fixes & Improvements Applied
 
-The following bugs were identified and fixed (all existing features preserved):
+All existing features and data have been strictly preserved while resolving calculation bugs and adding full currency support:
 
-| # | File | Bug | Fix |
+| # | Component | Issue | Solution |
 |---|---|---|---|
-| 1 | `LoanCalculator.java` | **Critical crash**: When `loan=0` or `rate=0`, the EMI formula denominator became `0`, causing `NaN` / `Infinity` | Added early return `0.0` when loan ≤ 0, rate ≤ 0, or months ≤ 0 |
-| 2 | `PredictionHelper.java` | **Mixed-language text**: Arabic word `متوسط` appeared in an English string (copy-paste error) | Replaced with English `"Average"` |
-| 3 | `ResultActivity.java` | **Invisible text**: Profit label color was `Color.WHITE` on a potentially light background | Changed to `#4CAF50` (green) — consistent with chart's profit color |
-| 4 | `MainActivity.java` | **Dead code**: `canvas.drawText("", ...)` drew nothing and was misleading | Removed and replaced with a descriptive comment |
+| 1 | `performFinancialAnalysis` | **Omitted Herd Count & Cow Cost**: In `MainActivity`, revenue was calculated without multiplying by `totalCows`, and cow purchase cost was completely omitted. It also used 360 days instead of 365. This caused a 10x-30x calculation error and false "Analysis Mismatch: Loss" alerts. | Unified logic with `BusinessCalculator.calculateProfit`, calculating exact total cows, milk yield, 365 days, initial investment, and accurate net profit/loss. |
+| 2 | `LoanCalculator.java` & `BusinessCalculator.java` | **Division-by-Zero Risk**: EMI formula could encounter `0` denominator when rate or loan was 0. | Added safety guard and delegated loan interest calculation in `BusinessCalculator` to `LoanCalculator.calculateEMI`. |
+| 3 | `Multi-Currency Support` | **Limited Currencies & No Persistence**: Previously only 6 codes were listed and currency selection was not saved across app restarts. | Added 32 world currency options (`$`, `₹`, `€`, `£`, `¥`, `रू`, `৳`, `₨`, `د.إ`, `﷼`, `C$`, `A$`, `CHF`, `₽`, `₩`, etc.), formatted currency across UI and PDFs, and persisted selected currency in `SharedPreferences`. |
+| 4 | `PredictionHelper.java` | **Unused & Currency-Blind**: AI prediction was hardcoded for fixed amounts without considering chosen currency or net profit. | Added currency-aware overloaded `predict()` method integrating herd size, yield, expenses, net profit, and currency symbol. |
+| 5 | `ResultActivity.java` | **Single-Bar Chart**: Chart only displayed a single bar. | Updated to render multi-year cumulative projection bars with dynamic currency labeling. |
+| 6 | **Formatting & Validations** | **Zero/Negative Years & Missing Separators**: Forecast years could be 0; large numbers lacked thousand separators. | Added validation ensuring positive cow count and years (≥1), and formatted all currency amounts with commas (`%,.2f`). |
 
 ---
 
